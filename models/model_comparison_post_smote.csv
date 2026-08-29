@@ -1,0 +1,7 @@
+Model,Accuracy,Precision,Recall,F1,Training Method,Test Samples,Classes
+Logistic Regression,0.776,0.787,0.776,0.773,Standard Split,Unknown,24
+Random Forest,0.816,0.832,0.816,0.812,Standard Split,Unknown,24
+XGBoost (Pre-SMOTE),0.872,0.876,0.872,0.871,Standard Split,Unknown,24
+Logistic Regression,0.776,0.787,0.776,0.773,SMOTE-Balanced,760,24
+Random Forest,0.816,0.832,0.816,0.812,SMOTE-Balanced,760,24
+XGBoost (Post-SMOTE),0.9684,0.9675,0.9684,0.9683,SMOTE-Balanced,760,24
