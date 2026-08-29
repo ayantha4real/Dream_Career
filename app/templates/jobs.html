@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+
+{% block title %}Browse Jobs — DreamCareer{% endblock %}
+
+{% block content %}
+
+<section class="page-head">
+    <div class="container">
+        <span class="section-label">{{ t('Job board') }}</span>
+        <h1 class="fw-bold mb-1">{{ t('Latest opportunities') }}</h1>
+        <p class="text-muted mb-0">
+            {{ t('found, collected automatically from partner job boards.') }}
+        </p>
+    </div>
+</section>
+
+<section class="container pb-3">
+    <!-- Search -->
+    <form method="GET" action="{{ url_for('main.jobs_page') }}" class="row g-2 mt-3">
+        {% if active_category %}
+            <input type="hidden" name="category" value="{{ active_category }}">
+        {% endif %}
+
+        <div class="col-md-9">
+            <div class="input-group">
+                <span class="input-group-text">🔍</span>
+                <input type="text" name="q" class="form-control"
+                       placeholder="Search by title, company or keyword…"
+                       value="{{ active_search }}">
+            </div>
+        </div>
+        <div class="col-md-3 d-flex gap-2">
+            <button type="submit" class="btn btn-primary flex-fill">{{ t('Search') }}</button>
+            {% if active_search or active_category %}
+                <a href="{{ url_for('main.jobs_page') }}" class="btn btn-ghost">{{ t('Clear') }}</a>
+            {% endif %}
+        </div>
+    </form>
+
+    <!-- Category chips -->
+    <div class="category-scroll mt-4">
+        <a href="{{ url_for('main.jobs_page', q=active_search or none) }}"
+           class="filter-chip {{ 'active' if not active_category else '' }}">
+            {{ t('All fields') }}
+        </a>
+
+        {% for category, count in categories %}
+            <a href="{{ url_for('main.jobs_page', category=category, q=active_search or none) }}"
+               class="filter-chip {{ 'active' if category == active_category else '' }}">
+                {{ category }} <span class="opacity-50">{{ count }}</span>
+            </a>
+        {% endfor %}
+    </div>
+</section>
+
+<section class="container pb-5">
+    <div class="row g-4 mt-2">
+        <div class="col-lg-9">
+            {% if jobs %}
+                <div class="row g-4">
+                    {% for job in jobs %}
+                        <div class="col-md-6">
+                            {% if job["personal_match"] %}
+                                <div class="personal-match-banner mb-2">
+                                    ⭐ Matches your latest analysis
+                                </div>
+                            {% endif %}
+                            {% include 'partials/job_card.html' %}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="empty-state mt-4">
+                    <div class="icon">🔎</div>
+                    <h5>No matching jobs</h5>
+                    Try a different keyword or clear the filters.
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Skill Demand Radar -->
+        <div class="col-lg-3 print-hide">
+            <div class="card p-4 sticky-top" style="top: 90px;">
+                <h5 class="mb-1">📡 Skill Demand Radar</h5>
+                <p class="text-muted small mb-3">
+                    Live from {{ demand["jobs_scanned"] }} scraped listings.
+                </p>
+
+                {% for item in demand["skills"] %}
+                    <div class="demand-row">
+                        <span class="demand-skill">{{ item["skill"] }}</span>
+                        <span class="demand-count">{{ item["count"] }}</span>
+                    </div>
+                {% else %}
+                    <p class="text-muted small">Run the scraper to compute demand.</p>
+                {% endfor %}
+
+                <a href="{{ url_for('main.home') }}#analyze" class="btn btn-ghost btn-sm w-100 mt-3">
+                    Compare with my skills →
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

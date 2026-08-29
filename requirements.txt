@@ -1,0 +1,20 @@
+Flask==3.1.3
+Flask-Login==0.6.3
+Flask-SQLAlchemy==3.1.1
+PyMuPDF==1.28.0
+
+# ML / NLP pipeline
+scikit-learn==1.9.0
+xgboost==3.4.1
+shap==0.52.0
+spacy>=3.8
+en_core_web_sm @ https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.8.0/en_core_web_sm-3.8.0-py3-none-any.whl
+pandas==3.0.5
+numpy==2.5.2
+joblib==1.5.3
+
+# Job scraping
+Scrapy==2.18.0
+
+# Testing
+pytest>=8.2

@@ -1,0 +1,146 @@
+{
+    "Adobe Photoshop": [
+        {
+            "title": "Adobe Certified Professional - Visual Design Using Adobe Photoshop",
+            "provider": "Adobe",
+            "type": "Professional Certification",
+            "url": "https://certifiedprofessional.adobe.com/photoshop"
+        }
+    ],
+    "Adobe Illustrator": [
+        {
+            "title": "Adobe Certified Professional - Graphic Design & Illustration Using Adobe Illustrator",
+            "provider": "Adobe",
+            "type": "Professional Certification",
+            "url": "https://certifiedprofessional.adobe.com/illustrator"
+        }
+    ],
+    "Adobe Premiere Pro": [
+        {
+            "title": "Adobe Certified Professional - Digital Video Using Adobe Premiere",
+            "provider": "Adobe",
+            "type": "Professional Certification",
+            "url": "https://certifiedprofessional.adobe.com/premiere"
+        }
+    ],
+    "Adobe Premiere": [
+        {
+            "title": "Adobe Certified Professional - Digital Video Using Adobe Premiere",
+            "provider": "Adobe",
+            "type": "Professional Certification",
+            "url": "https://certifiedprofessional.adobe.com/premiere"
+        }
+    ],
+    "Adobe After Effects": [
+        {
+            "title": "Adobe Certified Professional - Visual Effects & Motion Graphics Using Adobe After Effects",
+            "provider": "Adobe",
+            "type": "Professional Certification",
+            "url": "https://certifiedprofessional.adobe.com/after-effects"
+        }
+    ],
+    "Adobe InDesign": [
+        {
+            "title": "Adobe Certified Professional - Print & Digital Media Publication Using Adobe InDesign",
+            "provider": "Adobe",
+            "type": "Professional Certification",
+            "url": "https://certifiedprofessional.adobe.com/indesign"
+        }
+    ],
+    "Adobe Dreamweaver": [
+        {
+            "title": "Adobe Certified Professional - Web Authoring Using Adobe Dreamweaver",
+            "provider": "Adobe",
+            "type": "Professional Certification",
+            "url": "https://certifiedprofessional.adobe.com/dreamweaver"
+        }
+    ],
+    "Graphic Design": [
+        {
+            "title": "Adobe Graphic Designer Professional Certificate",
+            "provider": "Adobe / Coursera",
+            "type": "Professional Certificate",
+            "url": "https://certifiedprofessional.adobe.com/career-certificates"
+        }
+    ],
+    "UI Design": [
+        {
+            "title": "Adobe Graphic Designer Professional Certificate",
+            "provider": "Adobe / Coursera",
+            "type": "Professional Certificate",
+            "url": "https://certifiedprofessional.adobe.com/career-certificates"
+        }
+    ],
+    "UX Design": [
+        {
+            "title": "Adobe Graphic Designer Professional Certificate",
+            "provider": "Adobe / Coursera",
+            "type": "Professional Certificate",
+            "url": "https://certifiedprofessional.adobe.com/career-certificates"
+        }
+    ],
+    "Python": [
+        {
+            "title": "Python Programming Courses",
+            "provider": "Coursera",
+            "type": "Online Course",
+            "url": "https://www.coursera.org/courses?query=python"
+        }
+    ],
+    "SQL": [
+        {
+            "title": "SQL Courses",
+            "provider": "Coursera",
+            "type": "Online Course",
+            "url": "https://www.coursera.org/courses?query=sql"
+        }
+    ],
+    "Machine Learning": [
+        {
+            "title": "Machine Learning Courses",
+            "provider": "Coursera",
+            "type": "Online Course",
+            "url": "https://www.coursera.org/courses?query=machine%20learning"
+        }
+    ],
+    "Data Analysis": [
+        {
+            "title": "Data Analysis Courses",
+            "provider": "Coursera",
+            "type": "Online Course",
+            "url": "https://www.coursera.org/courses?query=data%20analysis"
+        }
+    ],
+    "Power BI": [
+        {
+            "title": "Power BI Courses",
+            "provider": "Coursera",
+            "type": "Online Course",
+            "url": "https://www.coursera.org/courses?query=power%20bi"
+        }
+    ],
+    "AWS": [
+        {
+            "title": "AWS Training and Certification",
+            "provider": "Amazon Web Services",
+            "type": "Professional Training",
+            "url": "https://aws.amazon.com/training/"
+        }
+    ],
+    "Docker": [
+        {
+            "title": "Docker Training",
+            "provider": "Docker",
+            "type": "Professional Training",
+            "url": "https://www.docker.com/get-started/"
+        }
+    ],
+    "Git": [
+        {
+            "title": "Git Learning Resources",
+            "provider": "GitHub",
+            "type": "Learning Resource",
+            "url": "https://skills.github.com/"
+        }
+    ]
+}

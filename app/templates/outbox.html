@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block title %}My alert emails — DreamCareer{% endblock %}
+
+{% block content %}
+
+<section class="page-head">
+    <div class="container">
+        <a href="{{ url_for('alerts.alerts_page') }}" class="text-muted text-decoration-none">
+            ← Back to alerts
+        </a>
+        <h1 class="fw-bold mt-3 mb-1">My alert emails</h1>
+        <p class="text-muted">
+            Digests generated for {{ current_user.email }}.
+            {% if entries %}Showing {{ entries|length }} most recent.{% endif %}
+        </p>
+    </div>
+</section>
+
+<section class="container pb-5">
+    {% if entries %}
+        {% for entry in entries %}
+            <details class="resume-text mb-3">
+                <summary>
+                    {{ entry.subject }}
+                    &nbsp;·&nbsp;
+                    <span class="text-muted small">
+                        {{ entry.created_at.strftime('%d %b %Y %H:%M') }} UTC
+                        · {{ 'sent' if entry.sent_ok else 'demo outbox' }}
+                    </span>
+                </summary>
+                <div class="resume-body">{{ entry.body }}</div>
+            </details>
+        {% endfor %}
+    {% else %}
+        <div class="empty-state mt-3">
+            <div class="icon">📭</div>
+            <h5>No alert emails yet</h5>
+            Run the scraper and matching jobs will appear here as a digest.
+        </div>
+    {% endif %}
+</section>
+
+{% endblock %}

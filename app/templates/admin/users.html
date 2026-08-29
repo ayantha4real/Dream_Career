@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Users — DreamCareer Admin{% endblock %}
+
+{% block content %}
+<section class="page-head">
+    <div class="container">
+        <a href="{{ url_for('admin.dashboard') }}" class="text-muted text-decoration-none">
+            ← Back to Dashboard
+        </a>
+        <h1 class="fw-bold mt-3 mb-1">Manage Users</h1>
+        <p class="text-muted mb-0">{{ users.total }} user{{ '' if users.total == 1 else 's' }} registered</p>
+    </div>
+</section>
+
+<section class="container pb-5">
+    {% if users.items %}
+        <div class="card p-0" style="overflow: hidden;">
+            <div class="table-responsive">
+                <table class="table align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Username</th>
+                            <th>Email</th>
+                            <th>Role</th>
+                            <th>Joined</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in users.items %}
+                            <tr>
+                                <td>{{ user.id }}</td>
+                                <td>{{ user.username }}</td>
+                                <td>{{ user.email }}</td>
+                                <td>
+                                    {% if user.is_admin %}
+                                        <span class="badge-soft success">Admin</span>
+                                    {% else %}
+                                        <span class="badge-soft muted">User</span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-muted">{{ user.created_at.strftime('%d %b %Y') if user.created_at else '—' }}</td>
+                                <td>
+                                    <form method="POST" action="{{ url_for('admin.toggle_admin', user_id=user.id) }}">
+                                        {% if user.is_admin %}
+                                            <button type="submit" class="btn btn-ghost btn-sm" onclick="return confirm('Remove admin privileges from {{ user.username }}?')">
+                                                Remove Admin
+                                            </button>
+                                        {% else %}
+                                            <button type="submit" class="btn btn-primary btn-sm" onclick="return confirm('Grant admin privileges to {{ user.username }}?')">
+                                                Make Admin
+                                            </button>
+                                        {% endif %}
+                                    </form>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            {% if users.pages > 1 %}
+                <div class="card-footer bg-transparent border-0 p-3 d-flex justify-content-center">
+                    <nav>
+                        <ul class="pagination mb-0">
+                            {% if users.has_prev %}
+                                <li class="page-item">
+                                    <a class="page-link" href="{{ url_for('admin.users', page=users.prev_num) }}">Previous</a>
+                                </li>
+                            {% endif %}
+                            {% for p in users.iter_pages(left_edge=2, right_edge=2, left_current=2, right_current=2) %}
+                                {% if p %}
+                                    <li class="page-item {% if p == users.page %}active{% endif %}">
+                                        <a class="page-link" href="{{ url_for('admin.users', page=p) }}">{{ p }}</a>
+                                    </li>
+                                {% else %}
+                                    <li class="page-item disabled"><span class="page-link">…</span></li>
+                                {% endif %}
+                            {% endfor %}
+                            {% if users.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="{{ url_for('admin.users', page=users.next_num) }}">Next</a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                </div>
+            {% endif %}
+        </div>
+    {% else %}
+        <div class="empty-state mt-4">
+            <div class="icon">👥</div>
+            <h5>No users yet</h5>
+        </div>
+    {% endif %}
+</section>
+{% endblock %}

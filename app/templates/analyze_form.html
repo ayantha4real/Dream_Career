@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block title %}Analyze Resume — DreamCareer{% endblock %}
+
+{% block content %}
+
+<section class="page-head">
+    <div class="container">
+        <a href="{{ url_for('main.home') }}" class="text-muted text-decoration-none">
+            ← Back to home
+        </a>
+    </div>
+</section>
+
+<section class="container pt-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <div class="glass-panel shadow-lg">
+                <h4 class="mb-1">📄 {{ t('Analyze your resume') }}</h4>
+                <p class="text-muted mb-4">{{ t('PDF only. Your report is generated instantly.') }}</p>
+
+                <form action="{{ url_for('main.analyze') }}" method="POST"
+                      enctype="multipart/form-data"
+                      onsubmit="return validateUpload()">
+
+                    <label class="upload-card d-block" id="uploadCard">
+                        <input type="file" name="resume" id="resumeInput"
+                               accept=".pdf,application/pdf" required>
+                        <div class="upload-icon">⬆</div>
+                        <div id="uploadFileName">{{ t('Click to upload or drag & drop') }}</div>
+                        <div class="upload-hint">{{ t('PDF file · max 16 MB') }}</div>
+                    </label>
+
+                    <button type="submit" class="btn btn-primary w-100 btn-lg mt-4">
+                        {{ t('Analyze My Career') }}
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    const input = document.getElementById('resumeInput');
+    const label = document.getElementById('uploadFileName');
+    const card = document.getElementById('uploadCard');
+
+    input.addEventListener('change', function () {
+        label.textContent = this.files.length ? this.files[0].name : 'Click to upload or drag & drop';
+    });
+
+    ['dragenter', 'dragover'].forEach(ev =>
+        card.addEventListener(ev, e => { e.preventDefault(); card.classList.add('dragover'); }));
+    ['dragleave', 'drop'].forEach(ev =>
+        card.addEventListener(ev, e => { e.preventDefault(); card.classList.remove('dragover'); }));
+    card.addEventListener('drop', e => {
+        if (e.dataTransfer.files.length) {
+            input.files = e.dataTransfer.files;
+            label.textContent = e.dataTransfer.files[0].name;
+        }
+    });
+
+    function validateUpload() {
+        if (!input.files.length) return false;
+        if (!input.files[0].name.toLowerCase().endsWith('.pdf')) {
+            alert('{{ t("Please upload a PDF file.") }}');
+            return false;
+        }
+        return true;
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,507 @@
+{% extends "base.html" %}
+
+{% block title %}Your Career Report — DreamCareer{% endblock %}
+
+{% block content %}
+
+<section class="container pt-5">
+    <!-- ============ SUMMARY HERO ============ -->
+    <div class="result-hero">
+        <span class="section-label">Analysis complete</span>
+
+        {% set best_skill_match = all_careers[0] if all_careers else None %}
+        {% set best_ai_match = ml_predictions[0] if ml_predictions else None %}
+
+        {% if best_skill_match and best_skill_match["score"] > 0 %}
+            <div class="top-match-pill mb-3">
+                🎯 Best fit:
+                {{ best_skill_match["career"] }}
+                &nbsp;·&nbsp;{{ best_skill_match["score"] }}% skill coverage
+            </div>
+            <h1 class="fw-bold h2 mb-2">
+                You're a strong match for
+                <span class="gradient-text">{{ best_skill_match["career"] }}</span>
+            </h1>
+        {% elif best_ai_match %}
+            <h1 class="fw-bold h2 mb-2">
+                Your report for
+                <span class="gradient-text">{{ best_ai_match["career"].title() }}</span>
+                is ready
+            </h1>
+        {% else %}
+            <h1 class="fw-bold h2 mb-2">Your career report is ready</h1>
+        {% endif %}
+
+        <p class="text-muted">
+            Based on the skills, experience and strengths we found in your
+            resume — compared against thousands of real career profiles.
+        </p>
+
+        <div class="row g-3 mt-3">
+            <div class="col-6 col-md-3">
+                <div class="stat-tile">
+                    <div class="stat-value">{{ skills|length }}</div>
+                    <div class="stat-label">Skills found</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="stat-tile">
+                    <div class="stat-value">{{ all_careers|length }}</div>
+                    <div class="stat-label">Careers assessed</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="stat-tile">
+                    <div class="stat-value">{{ jobs|length }}</div>
+                    <div class="stat-label">Jobs matched</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="stat-tile">
+                    <div class="stat-value">{{ qualifications|length }}</div>
+                    <div class="stat-label">Courses suggested</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if not skills %}
+        <div class="empty-state mt-4">
+            <div class="icon">🤔</div>
+            <h5>We couldn't detect any known skills in this file.</h5>
+            Make sure the PDF contains selectable text (not a scanned image) and try again.
+        </div>
+    {% endif %}
+</section>
+
+<!-- ============ JOB FIT CHECK ============ -->
+{% if fit_job and job_fit %}
+    <section class="container mt-5">
+        <div class="glass-panel" style="border-left: 4px solid {{ 'var(--success)' if job_fit['coverage'] >= 70 else ('var(--warning)' if job_fit['coverage'] >= 40 else 'var(--danger)') }};">
+            <span class="section-label">Fit check</span>
+            <h3 class="fw-bold mb-1">
+                Your fit for "{{ fit_job['title'] }}"
+            </h3>
+            <p class="text-muted mb-4">
+                {{ fit_job['company'] or 'Company not specified' }} ·
+                compared against {{ job_fit['required_count'] }} skills detected in this posting.
+            </p>
+
+            <div class="row align-items-center g-4">
+                <div class="col-md-4 text-center">
+                    <div class="stat-tile">
+                        <div class="stat-value">{{ job_fit["coverage"] }}%</div>
+                        <div class="stat-label">{{ job_fit["verdict"] }}</div>
+                    </div>
+                </div>
+
+                <div class="col-md-8">
+                    {% if job_fit["matched"] %}
+                        <strong>✅ You have:</strong>
+                        {% for skill in job_fit["matched"][:8] %}
+                            <span class="skill-chip chip-success py-1 px-2" style="font-size:.78rem;">{{ skill }}</span>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-muted mb-2">No overlap detected yet with this posting's requirements.</p>
+                    {% endif %}
+
+                    {% if job_fit["missing"] %}
+                        <div class="mt-3">
+                            <strong>⚠️ This posting also asks for:</strong>
+                            {% for skill in job_fit["missing"] %}
+                                <span class="skill-chip chip-danger py-1 px-2" style="font-size:.78rem;">{{ skill }}</span>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="mt-4">
+                <a href="{{ url_for('main.job_details', job_id=fit_job['id']) }}" class="btn btn-ghost btn-sm">
+                    ← Back to this job
+                </a>
+                {% if fit_job["url"] %}
+                    <a href="{{ fit_job['url'] }}" target="_blank" rel="noopener noreferrer"
+                       class="btn btn-primary btn-sm ms-2">
+                        {{ 'Apply now ↗' if job_fit['verdict'] == 'Ready to apply' else 'View original posting ↗' }}
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </section>
+{% endif %}
+
+<!-- ============ AI PREDICTIONS ============ -->
+<section class="container mt-5">
+    <span class="section-label">Your best matches</span>
+    <h3 class="fw-bold mb-1">Careers that suit you most</h3>
+    <p class="text-muted">
+        Ranked by how well your resume matches each career field.
+    </p>
+
+    {% if ml_low_confidence and skills %}
+        <div class="confidence-note mt-3">
+            ⚠️ We couldn't read enough detail in this resume to be fully
+            confident. A longer, more detailed CV will give sharper results —
+            the <a href="#skill-match" class="text-decoration-none fw-bold">skill-based matches below</a> are still reliable.
+        </div>
+    {% endif %}
+
+    {% if ml_predictions and not ml_low_confidence %}
+        <div class="glass-panel mt-4">
+            {% for prediction in ml_predictions %}
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between mb-1">
+                        <strong>{{ prediction["career"].title().replace("-", " ") }}</strong>
+                        <span>{{ prediction["probability"] }}%</span>
+                    </div>
+                    <div class="progress progress-lg" role="progressbar"
+                         aria-valuenow="{{ prediction['probability'] }}"
+                         aria-valuemin="0" aria-valuemax="100">
+                        <div class="progress-bar" style="width: {{ prediction['probability'] * 4 if prediction['probability'] <= 25 else 100 }}%;"></div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% elif not skills %}
+        <div class="card p-4 text-muted">AI predictions skipped — no usable text was extracted.</div>
+    {% endif %}
+</section>
+
+<!-- ============ WHAT INFLUENCED YOUR MATCH ============ -->
+{% if shap_explanations %}
+    <section class="container mt-5" id="shap-section">
+        <span class="section-label">Inside your result</span>
+        <h3 class="fw-bold mb-1">What influenced your match</h3>
+        <p class="text-muted">
+            The words and skills from your resume that helped or hurt your
+            top career match. Hover any bar for details.
+        </p>
+
+        <div class="glass-panel mt-4">
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+                <div class="shap-toggle" role="tablist">
+                    <button type="button" class="shap-tab active" data-shap-filter="all"
+                            onclick="filterShap('all', this)">All signals</button>
+                    <button type="button" class="shap-tab" data-shap-filter="positive"
+                            onclick="filterShap('positive', this)">▲ Positive</button>
+                    <button type="button" class="shap-tab" data-shap-filter="negative"
+                            onclick="filterShap('negative', this)">▼ Negative</button>
+                </div>
+
+                <div class="form-check form-switch shap-sort-switch">
+                    <input class="form-check-input" type="checkbox" id="shapSortToggle"
+                           onchange="sortShap(this.checked)">
+                    <label class="form-check-label text-muted small" for="shapSortToggle">
+                        Sort alphabetically
+                    </label>
+                </div>
+            </div>
+
+            <div class="shap-chart" id="shapChart">
+                {% for explanation in shap_explanations %}
+                    <div class="shap-row {{ explanation['direction'] }}"
+                         data-feature="{{ explanation['feature'] }}"
+                         data-impact="{{ explanation['impact'] }}"
+                         data-weight="{{ explanation['weight'] }}"
+                         tabindex="0">
+
+                        <span class="feature-name" title="{{ explanation['feature'] }}">
+                            {{ explanation["feature"] }}
+                        </span>
+
+                        <div class="progress progress-thin shap-track">
+                            {% if explanation["direction"] == "positive" %}
+                                <div class="progress-bar bar-success shap-fill"
+                                     style="--target-width: {{ explanation['weight'] }}%;"
+                                     title="+{{ explanation['impact'] }} — pushed prediction up"></div>
+                            {% else %}
+                                <div class="progress-bar bar-danger shap-fill"
+                                     style="--target-width: {{ explanation['weight'] }}%;"
+                                     title="{{ explanation['impact'] }} — pulled prediction down"></div>
+                            {% endif %}
+                        </div>
+
+                        <span class="impact-val {{ 'text-success' if explanation['direction'] == 'positive' else 'text-danger' }}">
+                            {{ '%+.4f' | format(explanation['impact']) }}
+                        </span>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <div class="empty-state d-none" id="shapEmpty">No signals match this filter.</div>
+
+            <p class="text-muted small mt-3 mb-0">
+                Bars further to the right had a bigger effect on your result.
+                Green helped your match, red worked against it.
+            </p>
+        </div>
+    </section>
+{% endif %}
+
+<!-- ============ DETECTED SKILLS ============ -->
+<section class="container mt-5">
+    <span class="section-label">Your profile</span>
+    <h3 class="fw-bold mb-3">Skills we found in your resume</h3>
+
+    {% if skills %}
+        <div class="glass-panel d-flex flex-wrap align-items-center">
+            {% for skill in skills %}
+                <span class="skill-chip">{{ skill }}</span>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state">We couldn't spot any known skills in this resume.</div>
+    {% endif %}
+</section>
+
+<!-- ============ RESUME INSIGHTS ============ -->
+{% if nlp %}
+    <section class="container mt-5">
+        <span class="section-label">Deeper look</span>
+        <h3 class="fw-bold mb-1">More about your resume</h3>
+        <p class="text-muted">
+            Companies, key phrases and document details we picked up while reading your CV.
+        </p>
+
+        <div class="row g-4 mt-2">
+            {% if nlp["organizations"] %}
+                <div class="col-lg-4">
+                    <div class="card p-4 h-100">
+                        <h6 class="text-muted text-uppercase small mb-3">🏢 Organizations detected</h6>
+                        {% for org in nlp["organizations"][:6] %}
+                            <div class="mb-2">{{ org }}</div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+
+            {% if nlp["keywords"] %}
+                <div class="col-lg-4">
+                    <div class="card p-4 h-100">
+                        <h6 class="text-muted text-uppercase small mb-3">🔑 Key phrases</h6>
+                        <div class="d-flex flex-wrap">
+                            {% for keyword in nlp["keywords"][:8] %}
+                                <span class="skill-chip chip-neutral py-1 px-2" style="font-size:.78rem;">{{ keyword }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+
+            <div class="col-lg-4">
+                <div class="card p-4 h-100">
+                    <h6 class="text-muted text-uppercase small mb-3">📊 Document profile</h6>
+
+                    <ul class="list-unstyled mb-0" style="font-size:.93rem;">
+                        <li class="mb-2"><strong>{{ nlp["word_count"] }}</strong> words ·
+                            <strong>{{ nlp["sentence_count"] }}</strong> sentences</li>
+
+                        {% if nlp["estimated_experience_years"] %}
+                            <li class="mb-2">≈ <strong>{{ nlp["estimated_experience_years"] }} years</strong> experience detected</li>
+                        {% endif %}
+
+                        {% if nlp["sections_found"] %}
+                            <li class="mb-2">
+                                Sections:
+                                {% for section in nlp["sections_found"][:6] %}
+                                    <span class="badge-soft muted">{{ section }}</span>
+                                {% endfor %}
+                            </li>
+                        {% endif %}
+
+                        {% if not nlp["readability_ok"] %}
+                            <li class="confidence-note mt-2">
+                                This document is quite short — a fuller resume
+                                will produce sharper AI predictions.
+                            </li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endif %}
+
+<!-- ============ SKILL-BASED CAREERS ============ -->
+<section class="container mt-5" id="skill-match">
+    <span class="section-label">Skill matching</span>
+    <h3 class="fw-bold mb-1">Skill-based career recommendations</h3>
+    <p class="text-muted">
+        Direct comparison of your detected skills against each career's required toolkit.
+    </p>
+
+    {% if careers %}
+        <div class="row g-4 mt-2">
+            {% for career in careers %}
+                <div class="col-lg-4">
+                    <div class="card card-hover p-4 h-100">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 class="mb-0">{{ career["career"] }}</h5>
+                            <span class="badge-soft {{ 'success' if career['score'] >= 60 else ('warning' if career['score'] >= 30 else 'muted') }}">
+                                {{ career["score"] }}%
+                            </span>
+                        </div>
+
+                        <div class="progress progress-thin mb-3">
+                            <div class="progress-bar" style="width: {{ career['score'] }}%;"></div>
+                        </div>
+
+                        <div class="small mb-2">
+                            <strong>Matched:</strong>
+                            {% if career["matched"] %}
+                                {% for skill in career["matched"] %}
+                                    <span class="skill-chip chip-success py-1 px-2" style="font-size:.78rem;">{{ skill }}</span>
+                                {% endfor %}
+                            {% else %}
+                                <span class="text-muted">none yet</span>
+                            {% endif %}
+                        </div>
+
+                        <div class="small">
+                            <strong>Missing:</strong>
+                            {% if career["missing"] %}
+                                {% for skill in career["missing"] %}
+                                    <span class="skill-chip chip-danger py-1 px-2" style="font-size:.78rem;">{{ skill }}</span>
+                                {% endfor %}
+                            {% else %}
+                                <span class="text-success">nothing — you're covered!</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state mt-3">Upload a resume with detectable skills to see career matches.</div>
+    {% endif %}
+</section>
+
+<!-- ============ QUALIFICATIONS ============ -->
+<section class="container mt-5">
+    <span class="section-label">Upskilling</span>
+    <h3 class="fw-bold mb-1">Recommended courses &amp; qualifications</h3>
+    <p class="text-muted">
+        Targeted at the skill gaps of your best-matching career.
+    </p>
+
+    {% if qualifications %}
+        <div class="row g-4 mt-2">
+            {% for qualification in qualifications %}
+                <div class="col-md-6 col-lg-4">
+                    <div class="card card-hover p-4 h-100 job-card">
+                        <span class="badge-soft primary align-self-start mb-2">
+                            Gap: {{ qualification["skill"] }}
+                        </span>
+                        <h5>{{ qualification["title"] }}</h5>
+                        <p class="text-muted small mb-1">
+                            <strong>Provider:</strong> {{ qualification["provider"] }}
+                        </p>
+                        <p class="text-muted small flex-grow-1">
+                            <strong>Type:</strong> {{ qualification["type"] }}
+                        </p>
+                        <a href="{{ qualification['url'] }}" target="_blank"
+                           rel="noopener noreferrer" class="btn btn-primary btn-sm w-100">
+                            View qualification ↗
+                        </a>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state mt-3">
+            <div class="icon">🎉</div>
+            No gaps to fill right now — or no courses matched your missing skills.
+        </div>
+    {% endif %}
+</section>
+
+<!-- ============ RECOMMENDED JOBS ============ -->
+<section class="container mt-5">
+    <div class="d-flex justify-content-between align-items-end">
+        <div>
+            <span class="section-label">For you</span>
+            <h3 class="fw-bold mb-1">Recommended live jobs</h3>
+            <p class="text-muted mb-0">
+                Ranked against your predicted careers, detected skills and profile.
+            </p>
+        </div>
+        <a href="{{ url_for('main.jobs_page') }}" class="btn btn-ghost btn-sm">Browse all →</a>
+    </div>
+
+    {% if jobs %}
+        <div class="row g-4 mt-3">
+            {% for job in jobs %}
+                <div class="col-md-6 col-lg-4">
+                    {% include 'partials/job_card.html' %}
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state mt-3">No job openings matched this profile yet — check back soon.</div>
+    {% endif %}
+</section>
+
+<!-- ============ RESUME TEXT ============ -->
+<section class="container my-5">
+    {% if resume_text %}
+        <details class="resume-text print-hide">
+            <summary>📄 View extracted resume text ({{ resume_text|length }} characters)</summary>
+            <div class="resume-body">{{ resume_text }}</div>
+        </details>
+    {% endif %}
+
+    <div class="text-center mt-5 print-hide">
+        <button type="button" class="btn btn-primary" onclick="window.print()">
+            ⬇ Download / Print report (PDF)
+        </button>
+        <a href="{{ url_for('main.home') }}#analyze" class="btn btn-ghost ms-2">↺ Analyze another resume</a>
+    </div>
+</section>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Animate SHAP bars in when they scroll into view
+    document.querySelectorAll('.shap-fill').forEach(bar => {
+        bar.style.width = '0%';
+        const observer = new IntersectionObserver(entries => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    requestAnimationFrame(() => {
+                        bar.style.width = bar.style.getPropertyValue('--target-width');
+                    });
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.3 });
+        observer.observe(bar.closest('.shap-row'));
+    });
+
+    function filterShap(filter, tabEl) {
+        document.querySelectorAll('.shap-tab').forEach(t => t.classList.remove('active'));
+        tabEl.classList.add('active');
+
+        let visible = 0;
+        document.querySelectorAll('#shapChart .shap-row').forEach(row => {
+            const show = filter === 'all' || row.classList.contains(filter);
+            row.classList.toggle('d-none', !show);
+            if (show) visible++;
+        });
+
+        document.getElementById('shapEmpty').classList.toggle('d-none', visible > 0);
+    }
+
+    function sortShap(alphabetical) {
+        const chart = document.getElementById('shapChart');
+        const rows = Array.from(chart.querySelectorAll('.shap-row'));
+
+        rows.sort((a, b) => alphabetical
+            ? a.dataset.feature.localeCompare(b.dataset.feature)
+            : parseFloat(b.dataset.weight) - parseFloat(a.dataset.weight));
+
+        rows.forEach(row => chart.appendChild(row));
+    }
+</script>
+{% endblock %}

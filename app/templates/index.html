@@ -1,0 +1,205 @@
+{% extends "base.html" %}
+
+{% block title %}DreamCareer — Discover Your Career with AI{% endblock %}
+
+{% block content %}
+
+<!-- ================= HERO ================= -->
+<section class="hero">
+    <div class="container position-relative">
+        <div class="row align-items-center g-5">
+            <div class="col-lg-6">
+                <span class="hero-badge">{{ t('✦ Built for Sri Lankan job seekers') }}</span>
+
+                <h1>
+                    {{ t('Find the career your resume is') }}
+                    <span class="gradient-text">{{ t('built for.') }}</span>
+                </h1>
+
+                <p class="lead">
+                    {{ t("Upload your CV and instantly discover the careers that suit you, the skills you're missing, courses to learn them, and live jobs hiring right now — all in one report.") }}
+                </p>
+
+                <div class="d-flex flex-wrap gap-3 mt-4">
+                    <a href="#analyze" class="btn btn-primary btn-lg">{{ t('Analyze my CV') }}</a>
+                    <a href="{{ url_for('main.jobs_page') }}" class="btn btn-ghost btn-lg">{{ t('Browse jobs') }}</a>
+                </div>
+
+                <div class="row g-3 mt-5">
+                    <div class="col-4">
+                        <div class="stat-tile">
+                            <div class="stat-value">24</div>
+                            <div class="stat-label">{{ t('Career fields') }}</div>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="stat-tile">
+                            <div class="stat-value">290+</div>
+                            <div class="stat-label">{{ t('Skills detected') }}</div>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="stat-tile">
+                            <div class="stat-value">{{ jobs|length }}</div>
+                            <div class="stat-label">{{ t('Latest jobs') }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Upload card -->
+            <div class="col-lg-6" id="analyze">
+                <div class="glass-panel shadow-lg">
+                    <h4 class="mb-1">📄 {{ t('Analyze your resume') }}</h4>
+                    <p class="text-muted mb-4">{{ t('PDF only. Your report is generated instantly.') }}</p>
+
+                    <form action="{{ url_for('main.analyze') }}" method="POST"
+                          enctype="multipart/form-data"
+                          onsubmit="return validateUpload()">
+
+                        <label class="upload-card d-block" id="uploadCard">
+                            <input type="file" name="resume" id="resumeInput"
+                                   accept=".pdf,application/pdf" required>
+                            <div class="upload-icon">⬆</div>
+                            <div id="uploadFileName">Click to upload or drag &amp; drop</div>
+                            <div class="upload-hint">PDF file · max 16 MB</div>
+                        </label>
+
+                        <button type="submit" class="btn btn-primary w-100 btn-lg mt-4">
+                            {{ t('Analyze My Career') }}
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ================= HOW IT WORKS ================= -->
+<section class="container py-5">
+    <div class="text-center mb-5">
+        <span class="section-label justify-content-center">{{ t('How it works') }}</span>
+        <h2 class="fw-bold">{{ t('Three simple steps to your next job') }}</h2>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="card card-hover p-4 h-100 text-center">
+                <div class="feature-icon mx-auto">📤</div>
+                <h5 class="mt-2 mb-2">{{ t('Upload your CV') }}</h5>
+                <p class="text-muted mb-0">
+                    {{ t('Drop in your PDF resume — it only takes a few seconds.') }}
+                </p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card card-hover p-4 h-100 text-center">
+                <div class="feature-icon mx-auto">🎯</div>
+                <h5 class="mt-2 mb-2">{{ t('See your best-fit careers') }}</h5>
+                <p class="text-muted mb-0">
+                    {{ t('We compare your skills with real career paths and show exactly where you stand.') }}
+                </p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card card-hover p-4 h-100 text-center">
+                <div class="feature-icon mx-auto">🎓</div>
+                <h5 class="mt-2 mb-2">{{ t('Learn & apply') }}</h5>
+                <p class="text-muted mb-0">
+                    {{ t('Get course suggestions for missing skills and apply to live jobs that match.') }}
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ================= SKILL DEMAND RADAR ================= -->
+{% if demand and demand["skills"] %}
+    <section class="container py-5">
+        <div class="glass-panel">
+            <div class="row align-items-center g-4">
+                <div class="col-lg-4">
+                    <span class="section-label">{{ t('Market intelligence') }}</span>
+                    <h3 class="fw-bold mb-2">{{ t('📡 Skill Demand Radar') }}</h3>
+                    <p class="text-muted mb-0">
+                        {{ t('The skills employers ask for most, updated live from real job listings. Analyze your CV to see which of these you already have.') }}
+                    </p>
+                </div>
+
+                <div class="col-lg-8">
+                    {% set max_count = demand["skills"][0]["count"] if demand["skills"] else 1 %}
+                    {% for item in demand["skills"] %}
+                        <div class="demand-row mb-1">
+                            <span class="demand-skill">{{ item["skill"] }}</span>
+                            <div class="progress progress-thin flex-fill mx-3" style="min-width: 80px;">
+                                <div class="progress-bar"
+                                     style="width: {{ (item['count'] / max_count * 100) | round | int }}%;"></div>
+                            </div>
+                            <span class="demand-count">{{ item["count"] }}</span>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </section>
+{% endif %}
+
+<!-- ================= LATEST JOBS ================= -->
+<section class="container pb-4">
+    <div class="d-flex justify-content-between align-items-end mb-4">
+        <div>
+            <span class="section-label">Live listings</span>
+            <h2 class="fw-bold mb-0">Latest opportunities</h2>
+        </div>
+        <a href="{{ url_for('main.jobs_page') }}" class="btn btn-ghost btn-sm">{{ t('View all →') }}</a>
+    </div>
+
+    {% if jobs %}
+        <div class="row g-4">
+            {% for job in jobs %}
+                <div class="col-md-6 col-lg-4">
+                    {% include 'partials/job_card.html' %}
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <div class="icon">💼</div>
+            No jobs collected yet — run the scraper to populate listings.
+        </div>
+    {% endif %}
+</section>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    const input = document.getElementById('resumeInput');
+    const label = document.getElementById('uploadFileName');
+    const card = document.getElementById('uploadCard');
+
+    input.addEventListener('change', function () {
+        label.textContent = this.files.length ? this.files[0].name : 'Click to upload or drag & drop';
+    });
+
+    ['dragenter', 'dragover'].forEach(ev =>
+        card.addEventListener(ev, e => { e.preventDefault(); card.classList.add('dragover'); }));
+    ['dragleave', 'drop'].forEach(ev =>
+        card.addEventListener(ev, e => { e.preventDefault(); card.classList.remove('dragover'); }));
+    card.addEventListener('drop', e => {
+        if (e.dataTransfer.files.length) {
+            input.files = e.dataTransfer.files;
+            label.textContent = e.dataTransfer.files[0].name;
+        }
+    });
+
+    function validateUpload() {
+        if (!input.files.length) return false;
+        if (!input.files[0].name.toLowerCase().endsWith('.pdf')) {
+            alert('Please upload a PDF file.');
+            return false;
+        }
+        return true;
+    }
+</script>
+{% endblock %}

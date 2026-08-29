@@ -1,0 +1,56 @@
+{
+    "Data Analyst": {
+        "required_skills": [
+            "Python",
+            "SQL",
+            "Excel",
+            "Power BI",
+            "Pandas",
+            "Statistics"
+        ]
+    },
+
+    "Data Scientist": {
+        "required_skills": [
+            "Python",
+            "Machine Learning",
+            "TensorFlow",
+            "Pandas",
+            "NumPy",
+            "SQL"
+        ]
+    },
+
+    "Backend Developer": {
+        "required_skills": [
+            "Python",
+            "Flask",
+            "SQL",
+            "REST API",
+            "Docker",
+            "Git"
+        ]
+    },
+
+    "Frontend Developer": {
+        "required_skills": [
+            "HTML",
+            "CSS",
+            "JavaScript",
+            "React",
+            "Bootstrap",
+            "Git"
+        ]
+    },
+
+    "Full Stack Developer": {
+        "required_skills": [
+            "Python",
+            "Flask",
+            "HTML",
+            "CSS",
+            "JavaScript",
+            "SQL"
+        ]
+    }
+}

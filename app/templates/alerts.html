@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block title %}Job Alerts — DreamCareer{% endblock %}
+
+{% block content %}
+
+<section class="page-head">
+    <div class="container">
+        <span class="section-label">{{ t('Stay ahead') }}</span>
+        <h1 class="fw-bold mb-1">{{ t('Email job alerts') }}</h1>
+    </div>
+</section>
+
+<section class="container pb-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+
+            <form method="POST" action="{{ url_for('alerts.save_alert') }}"
+                  class="glass-panel">
+
+                <div class="mb-4">
+                    <label class="form-label" for="email">Email address</label>
+                    <input type="email" class="form-control" id="email" name="email"
+                           value="{{ alert.email if alert else current_user.email }}"
+                           required>
+                </div>
+
+                <label class="form-label d-block mb-2">Job fields to watch</label>
+                <div class="row g-2 mb-4">
+                    {% for group in groups %}
+                        <div class="col-sm-6">
+                            <div class="form-check alert-check">
+                                <input class="form-check-input" type="checkbox"
+                                       name="groups" id="g{{ loop.index }}"
+                                       value="{{ group }}"
+                                       {{ 'checked' if group in selected }}>
+                                <label class="form-check-label" for="g{{ loop.index }}">
+                                    {{ group }}
+                                </label>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+
+                <div class="d-flex flex-wrap align-items-center gap-3">
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        Save preferences
+                    </button>
+
+                    <div class="form-check form-switch mb-0">
+                        <input class="form-check-input" type="checkbox" role="switch"
+                               id="is_active" name="is_active"
+                               {{ 'checked' if not alert or alert.is_active }}>
+                        <label class="form-check-label text-muted" for="is_active">
+                            Alerts on
+                        </label>
+                    </div>
+                </div>
+            </form>
+
+            <div class="text-center mt-4">
+                <a href="{{ url_for('alerts.outbox') }}" class="text-muted small">
+                    📬 View emails we've sent you
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

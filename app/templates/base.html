@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="{{ lang }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}DreamCareer — AI Career Intelligence{% endblock %}</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+Sinhala:wght@400;600;700&family=Noto+Sans+Tamil:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg site-nav">
+    <div class="container">
+        <a class="navbar-brand" href="{{ url_for('main.home') }}">
+            <span class="brand-mark">◆</span> Dream<span class="gradient-text">Career</span>
+        </a>
+
+        <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse"
+                data-bs-target="#navMenu" aria-controls="navMenu" aria-expanded="false"
+                aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navMenu">
+            <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-1">
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('main.home') }}">{{ t('Home') }}</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('main.jobs_page') }}">{{ t('Browse Jobs') }}</a>
+                </li>
+
+                {% if current_user.is_authenticated %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('main.history') }}">{{ t('My History') }}</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('alerts.alerts_page') }}">{{ t('Alerts') }}</a>
+                    </li>
+                    {% if current_user.is_admin %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('admin.dashboard') }}">{{ t('Admin') }}</a>
+                        </li>
+                    {% endif %}
+                    <li class="nav-item">
+                        <span class="nav-link text-muted">{{ current_user.username }}</span>
+                    </li>
+                    <li class="nav-item ms-lg-2">
+                        <form method="POST" action="{{ url_for('auth.logout') }}">
+                            <button type="submit" class="btn btn-ghost btn-sm">{{ t('Log out') }}</button>
+                        </form>
+                    </li>
+                {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('auth.login') }}">{{ t('Log in') }}</a>
+                    </li>
+                    <li class="nav-item ms-lg-2">
+                        <a class="btn btn-primary btn-sm" href="{{ url_for('auth.register') }}">{{ t('Get started') }}</a>
+                    </li>
+                {% endif %}
+
+                <li class="nav-item ms-lg-2">
+                    <div class="dropdown">
+                        <button type="button" class="lang-toggle dropdown-toggle"
+                                data-bs-toggle="dropdown" aria-expanded="false"
+                                aria-label="Select language">
+                            🌐 {{ languages[lang] }}
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            {% for code, name in languages.items() %}
+                                <li>
+                                    <a class="dropdown-item {{ 'active' if code == lang }}"
+                                       href="{{ url_for('main.set_lang', lang_code=code, next=request.path) }}">
+                                        {{ name }}
+                                    </a>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </li>
+
+                <li class="nav-item ms-lg-2">
+                    <button type="button" class="theme-toggle" id="themeToggle"
+                            aria-label="Switch between dark and light mode"
+                            title="Toggle day / night mode">
+                        <span class="icon-moon">🌙</span>
+                        <span class="icon-sun">☀️</span>
+                    </button>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<main>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="flash-stack">
+                {% for category, message in messages %}
+                    <div class="flash-toast {{ category }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+</main>
+
+<footer class="site-footer">
+    <div class="container d-flex flex-column flex-md-row justify-content-between gap-2">
+        <div>
+            <strong>DreamCareer</strong> — AI-powered career intelligence
+        </div>
+        <div>
+            <a href="{{ url_for('main.jobs_page') }}">Jobs</a>
+            &nbsp;·&nbsp;
+            <a href="{{ url_for('main.home') }}#analyze">Analyze CV</a>
+        </div>
+    </div>
+</footer>
+
+<!-- ============ AI ASSISTANT WIDGET ============ -->
+<div class="chat-widget" id="chatWidget">
+    <div class="chat-panel d-none" id="chatPanel" aria-live="polite">
+        <div class="chat-header">
+            <div>
+                <span class="chat-bot-avatar">◆</span>
+                <strong>Dreamy</strong>
+                <span class="text-muted small ms-1">· AI guide</span>
+            </div>
+            <button type="button" class="chat-close" id="chatClose"
+                    aria-label="Close chat">×</button>
+        </div>
+
+        <div class="chat-body" id="chatBody">
+            <div class="chat-msg bot">
+                Hi! I'm <b>Dreamy</b> 👋 Ask me how to analyze your CV,
+                find jobs, or what your report means.
+            </div>
+        </div>
+
+        <div class="chat-suggestions" id="chatSuggestions">
+            <button type="button" data-msg="How do I analyze my CV?">How do I analyze?</button>
+            <button type="button" data-msg="Find me jobs">Find jobs</button>
+            <button type="button" data-msg="Explain the AI prediction">How does the AI work?</button>
+        </div>
+
+        <form class="chat-input" id="chatForm">
+            <input type="text" id="chatInput" placeholder="Ask Dreamy anything…"
+                   autocomplete="off" maxlength="300">
+            <button type="submit" class="btn btn-primary btn-sm" aria-label="Send">➤</button>
+        </form>
+    </div>
+
+    <button type="button" class="chat-fab" id="chatFab"
+            aria-label="Open AI assistant">💬</button>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // ============ THEME TOGGLE ============
+    (function () {
+        const root = document.documentElement;
+        const toggle = document.getElementById('themeToggle');
+        const saved = localStorage.getItem('dc-theme');
+
+        if (saved === 'light') {
+            root.setAttribute('data-theme', 'light');
+        }
+
+        toggle.addEventListener('click', function () {
+            const next = root.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+            if (next === 'light') {
+                root.setAttribute('data-theme', 'light');
+            } else {
+                root.removeAttribute('data-theme');
+            }
+            localStorage.setItem('dc-theme', next);
+        });
+    })();
+</script>
+<script>
+    // Scroll-reveal for page sections
+    document.addEventListener('DOMContentLoaded', function () {
+        const targets = document.querySelectorAll('main section > .container, main section.container');
+        targets.forEach(el => el.classList.add('reveal'));
+
+        if ('IntersectionObserver' in window) {
+            const observer = new IntersectionObserver(entries => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('revealed');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.08 });
+
+            targets.forEach(el => observer.observe(el));
+        } else {
+            targets.forEach(el => el.classList.add('revealed'));
+        }
+
+        // Stagger job cards
+        document.querySelectorAll('.job-card').forEach((card, i) => {
+            card.style.animation = `fadeUp .5s ease backwards ${Math.min(i * 0.06, 0.5)}s`;
+        });
+    });
+</script>
+<script>
+    setTimeout(function () {
+        document.querySelectorAll('.flash-toast').forEach(function (el) {
+            el.style.transition = 'opacity .4s ease';
+            el.style.opacity = '0';
+            setTimeout(function () { el.remove(); }, 400);
+        });
+    }, 4500);
+</script>
+<script>
+    // =========== AI ASSISTANT ============
+    (function () {
+        const fab = document.getElementById('chatFab');
+        const panel = document.getElementById('chatPanel');
+        const closeBtn = document.getElementById('chatClose');
+        const body = document.getElementById('chatBody');
+        const form = document.getElementById('chatForm');
+        const input = document.getElementById('chatInput');
+        const suggestions = document.getElementById('chatSuggestions');
+
+        function openChat() {
+            panel.classList.remove('d-none');
+            panel.classList.add('open');
+            setTimeout(() => input.focus(), 120);
+        }
+
+        function closeChat() {
+            panel.classList.add('d-none');
+            panel.classList.remove('open');
+        }
+
+        fab.addEventListener('click', () => {
+            panel.classList.contains('d-none') ? openChat() : closeChat();
+        });
+
+        closeBtn.addEventListener('click', closeChat);
+
+        suggestions.addEventListener('click', e => {
+            const btn = e.target.closest('button[data-msg]');
+            if (!btn) return;
+            send(btn.dataset.msg);
+            suggestions.classList.add('d-none');
+        });
+
+        form.addEventListener('submit', e => {
+            e.preventDefault();
+            const text = input.value.trim();
+            if (text) {
+                send(text);
+                input.value = '';
+                suggestions.classList.add('d-none');
+            }
+        });
+
+        function addBubble(className, html) {
+            const div = document.createElement('div');
+            div.className = 'chat-msg ' + className;
+            div.innerHTML = html;
+            body.appendChild(div);
+            body.scrollTop = body.scrollHeight;
+            return div;
+        }
+
+        async function send(text) {
+            addBubble('user', document.createTextNode(text).textContent);
+
+            const typing = addBubble('bot', '<span class="chat-typing"><i></i><i></i><i></i></span>');
+
+            try {
+                const res = await fetch('{{ url_for("assistant.reply") }}', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: text })
+                });
+                const data = await res.json();
+
+                let actionsHtml = '';
+                if (data.actions && data.actions.length) {
+                    actionsHtml = '<div class="chat-actions">' + data.actions.map(a =>
+                        `<a href="${a.url}" class="btn btn-ghost btn-sm">${a.label}</a>`).join('') + '</div>';
+                }
+
+                typing.innerHTML = document.createTextNode(data.reply).textContent + actionsHtml;
+            } catch (err) {
+                typing.textContent = "Sorry, I couldn't reach the server. Please try again.";
+            }
+            body.scrollTop = body.scrollHeight;
+        }
+    })();
+</script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

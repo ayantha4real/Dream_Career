@@ -1,0 +1,109 @@
+{
+  "groups": {
+    "Information Technology": [
+      "IT-SWare / Internet",
+      "IT-HWare/ Networks/ Systems",
+      "Telecommunications",
+      "IT-Sware/DB/QA/Web/Graphics/GIS",
+      "IT-HWare/Networks/Systems",
+      "IT-Telecoms"
+    ],
+    "Finance & Accounting": [
+      "Accountancy & Finance",
+      "Banking and Financial Services",
+      "Insurance",
+      "Recoveries",
+      "Accounting/Auditing/Finance",
+      "Banking & Finance/Insurance"
+    ],
+    "Marketing & Sales": [
+      "Sales / Marketing / New Business Development",
+      "Digital Marketing",
+      "Sales/Marketing/Merchandising"
+    ],
+    "Design & Creative": [
+      "Media/ Advertising/ Communication/ Design",
+      "Interior Design",
+      "Media/Advert/Communication"
+    ],
+    "Engineering & Construction": [
+      "Building & Construction",
+      "Engineering / Manufacturing",
+      "Technical/ Mechanical",
+      "Electronics / Electrical",
+      "Architecture",
+      "Civil Eng/Interior Design/Architecture",
+      "Eng-Mech/Auto/Elec"
+    ],
+    "Healthcare & Medical": [
+      "Hospital/ Nursing/ Healthcare",
+      "Pharmaceutical",
+      "Medical/Nursing/Healthcare"
+    ],
+    "Hospitality & Tourism": [
+      "Hotel/ Hospitality/ Leisure",
+      "Travel/Ticketing/Airline/Shipping",
+      "Hotel/Restaurant/Hospitality",
+      "Travel/Tourism",
+      "Ticketing/Airline/Marine"
+    ],
+    "BPO & Customer Service": [
+      "BPO/ KPO",
+      "Call Center",
+      "Customer Service",
+      "KPO/BPO",
+      "Customer Relations/Public Relations"
+    ],
+    "Business & Management": [
+      "Business Management",
+      "Senior Management / Directors",
+      "Project Management / Programme Management",
+      "Human Resources / Recruitment",
+      "Training and Development",
+      "Administration / Secretarial",
+      "Legal / Law",
+      "HR/Training",
+      "Corporate Management/Analysts",
+      "Office Admin/Secretary/Receptionist",
+      "Legal/Law"
+    ],
+    "Logistics & Operations": [
+      "Supply Chain / Logistics / Procurement",
+      "Production & Operations",
+      "Logistics/Warehouse/Transport",
+      "Manufacturing/Operations",
+      "Supervision/Quality Control",
+      "Imports/Exports"
+    ],
+    "Government & Education": [
+      "Government/ Public Sector",
+      "Security/ Military",
+      "Education / Higher Education",
+      "Science / Research",
+      "Environment/ Health & Safety",
+      "Education",
+      "R&D/Science/Research",
+      "Security",
+      "International Development"
+    ],
+    "Other Industries": [
+      "FMCG/ Food Industry",
+      "Retail / Fashion",
+      "Apparel",
+      "Automobile",
+      "Agriculture",
+      "Delivery / Driving / Transport",
+      "School Leavers",
+      "Trainee",
+      "Internship / Undergraduate",
+      "Work From Home / Hybrid",
+      "Other",
+      "Sports/Fitness/Recreation",
+      "Apparel/Clothing",
+      "Agriculture/Dairy/Environment",
+      "Fashion/Design/Beauty",
+      "Recent Vacancies"
+    ]
+  },
+  "fallback_group": "Other Industries"
+}

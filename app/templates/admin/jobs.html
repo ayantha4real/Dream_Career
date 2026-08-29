@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Jobs — DreamCareer Admin{% endblock %}
+
+{% block content %}
+<section class="page-head">
+    <div class="container">
+        <a href="{{ url_for('admin.dashboard') }}" class="text-muted text-decoration-none">
+            ← Back to Dashboard
+        </a>
+        <h1 class="fw-bold mt-3 mb-1">Manage Jobs</h1>
+        <p class="text-muted">{{ total }} job{{ '' if total == 1 else 's' }} in registry</p>
+    </div>
+</section>
+
+<section class="container pb-5">
+    {% if jobs %}
+        <div class="card p-0" style="overflow: hidden;">
+            <div class="table-responsive">
+                <table class="table align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Title</th>
+                            <th>Company</th>
+                            <th>Category</th>
+                            <th>Source</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for job in jobs %}
+                            <tr>
+                                <td>{{ job.id }}</td>
+                                <td style="max-width: 250px;">
+                                    <span class="text-truncate d-inline-block" style="max-width: 220px;">
+                                        {{ job.title }}
+                                    </span>
+                                </td>
+                                <td>{{ job.company or '—' }}</td>
+                                <td>{{ job.category or '—' }}</td>
+                                <td><span class="badge-soft muted">{{ job.source or '—' }}</span></td>
+                                <td>
+                                    <form method="POST" action="{{ url_for('admin.delete_job', job_id=job.id) }}"
+                                          onsubmit="return confirm('Delete this job listing?');">
+                                        <button type="submit" class="btn btn-ghost btn-sm">Delete</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            {% if pages > 1 %}
+                <div class="card-footer bg-transparent border-0 p-3 d-flex justify-content-center">
+                    <nav>
+                        <ul class="pagination mb-0">
+                            {% if page > 1 %}
+                                <li class="page-item">
+                                    <a class="page-link" href="{{ url_for('admin.jobs', page=page-1) }}">Previous</a>
+                                </li>
+                            {% endif %}
+                            {% for p in range(1, pages+1) %}
+                                <li class="page-item {% if p == page %}active{% endif %}">
+                                    <a class="page-link" href="{{ url_for('admin.jobs', page=p) }}">{{ p }}</a>
+                                </li>
+                            {% endfor %}
+                            {% if page < pages %}
+                                <li class="page-item">
+                                    <a class="page-link" href="{{ url_for('admin.jobs', page=page+1) }}">Next</a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                </div>
+            {% endif %}
+        </div>
+    {% else %}
+        <div class="empty-state mt-4">
+            <div class="icon">💼</div>
+            <h5>No jobs in registry</h5>
+            <p class="mb-3">Run the scraper to populate job listings.</p>
+            <a href="{{ url_for('admin.dashboard') }}" class="btn btn-primary">Back to Dashboard</a>
+        </div>
+    {% endif %}
+</section>
+{% endblock %}

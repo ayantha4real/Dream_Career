@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard — DreamCareer{% endblock %}
+
+{% block content %}
+<section class="page-head">
+    <div class="container">
+        <span class="section-label">Administration</span>
+        <h1 class="fw-bold mb-1">Admin Dashboard</h1>
+        <p class="text-muted">System overview and management tools.</p>
+    </div>
+</section>
+
+<section class="container pb-5">
+    <!-- Stats Cards -->
+    <div class="row g-4 mb-5">
+        <div class="col-md-3">
+            <div class="card stat-card h-100">
+                <div class="stat-icon bg-primary">👥</div>
+                <div class="stat-value">{{ total_users }}</div>
+                <div class="stat-label">Total Users</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card stat-card h-100">
+                <div class="stat-icon bg-success">📊</div>
+                <div class="stat-value">{{ total_analyses }}</div>
+                <div class="stat-label">Analyses Run</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card stat-card h-100">
+                <div class="stat-icon bg-info">💼</div>
+                <div class="stat-value">{{ total_jobs }}</div>
+                <div class="stat-label">Jobs in Registry</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card stat-card h-100">
+                <div class="stat-icon bg-warning">🔔</div>
+                <div class="stat-value">{{ active_alerts }}</div>
+                <div class="stat-label">Active Alerts</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Recent Analyses -->
+        <div class="col-lg-8">
+            <div class="card p-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <span class="section-label">Recent Activity</span>
+                    <a href="{{ url_for('admin.users') }}" class="btn btn-ghost btn-sm">View All</a>
+                </div>
+                {% if recent_analyses %}
+                    <div class="table-responsive">
+                        <table class="table align-middle mb-0">
+                            <thead>
+                                <tr>
+                                    <th>User</th>
+                                    <th>Top Career</th>
+                                    <th>Skill Score</th>
+                                    <th>ML Confidence</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for a in recent_analyses %}
+                                <tr>
+                                    <td>{{ a.user.username if a.user else 'Anonymous' }}</td>
+                                    <td>{{ a.top_career or '—' }}</td>
+                                    <td>{{ a.top_skill_score or 0 }}%</td>
+                                    <td>
+                                        {% if a.ml_confidence %}
+                                            <span class="badge-soft {{ 'success' if a.ml_confidence >= 70 else ('warning' if a.ml_confidence >= 40 else 'danger') }}">
+                                                {{ a.ml_confidence }}%
+                                            </span>
+                                        {% else %}
+                                            <span class="text-muted">—</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-muted small">{{ a.created_at.strftime('%d %b %Y %H:%M') }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="empty-state">
+                        <div class="icon">📊</div>
+                        <h5>No analyses yet</h5>
+                        <p class="text-muted">Users' analyses will appear here.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="col-lg-4">
+            <div class="card p-4 h-100">
+                <h5 class="mb-3">Quick Actions</h5>
+                <div class="d-grid gap-2">
+                    <a href="{{ url_for('admin.users') }}" class="btn btn-primary">
+                        👥 Manage Users
+                    </a>
+                    <a href="{{ url_for('admin.jobs') }}" class="btn btn-primary">
+                        💼 Manage Jobs
+                    </a>
+                    <a href="{{ url_for('admin.analytics') }}" class="btn btn-primary">
+                        📊 View Analytics
+                    </a>
+                    <a href="{{ url_for('admin.dataset') }}" class="btn btn-primary">
+                        📦 Manage Dataset
+                    </a>
+                    <a href="{{ url_for('admin.outbox') }}" class="btn btn-primary">
+                        📬 Email Outbox
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

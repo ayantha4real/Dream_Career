@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+
+{% block title %}Analytics — DreamCareer Admin{% endblock %}
+
+{% block content %}
+<section class="page-head">
+    <div class="container">
+        <a href="{{ url_for('admin.dashboard') }}" class="text-muted text-decoration-none">
+            ← Back to Dashboard
+        </a>
+        <h1 class="fw-bold mt-3 mb-1">Analytics</h1>
+        <p class="text-muted">System analytics and trends</p>
+    </div>
+</section>
+
+<section class="container pb-5">
+    <div class="row g-4 mb-4">
+        <div class="col-md-3">
+            <div class="stat-card text-center p-4">
+                <div class="stat-value">{{ total_analyses }}</div>
+                <div class="stat-label">Analyses (30d)</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card text-center p-4">
+                <div class="stat-value">{{ total_alerts }}</div>
+                <div class="stat-label">Total Alerts</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card text-center p-4">
+                <div class="stat-value">{{ active_alerts }}</div>
+                <div class="stat-label">Active Alerts</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card text-center p-4">
+                <div class="stat-value">{{ emails_sent }}</div>
+                <div class="stat-label">Emails Sent</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-6">
+            <div class="card p-4 h-100">
+                <h5 class="mb-3">Top Predicted Careers (30d)</h5>
+                {% if top_careers %}
+                    <div class="table-responsive">
+                        <table class="table align-middle mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Career</th>
+                                    <th class="text-end">Count</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for career, count in top_careers %}
+                                    <tr>
+                                        <td>{{ career }}</td>
+                                        <td class="text-end fw-bold">{{ count }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <p class="text-muted mb-0">No analyses in the last 30 days.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="card p-4 h-100">
+                <h5 class="mb-3">Job Categories Distribution</h5>
+                {% if categories %}
+                    <div class="table-responsive">
+                        <table class="table align-middle mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Category</th>
+                                    <th class="text-end">Jobs</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for category, count in categories %}
+                                    <tr>
+                                        <td>{{ category }}</td>
+                                        <td class="text-end">{{ count }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <p class="text-muted mb-0">No job categories found.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="col-lg-12 mt-2">
+            <div class="card p-4">
+                <h5 class="mb-3">Email Alert Stats</h5>
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <div class="stat-tile">
+                            <div class="stat-value">{{ total_alerts }}</div>
+                            <div class="stat-label">Total Alerts</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-tile">
+                            <div class="stat-value">{{ active_alerts }}</div>
+                            <div class="stat-label">Active Alerts</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-tile">
+                            <div class="stat-value text-success">{{ emails_sent }}</div>
+                            <div class="stat-label">Sent OK</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-tile">
+                            <div class="stat-value text-danger">{{ emails_failed }}</div>
+                            <div class="stat-label">Failed</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
