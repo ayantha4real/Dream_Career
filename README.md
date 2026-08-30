@@ -76,6 +76,11 @@ venv\Scripts\python scripts\refresh_jobs.py
 venv\Scripts\python -m pytest tests/ -v
 ```
 
+### Admin Login
+
+- **Username:** `admin`
+- **Password:** `admin1`
+
 ## Model performance (held-out test split, SMOTE-balanced training)
 
 | Model | Accuracy | F1 |
